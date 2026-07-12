@@ -28,7 +28,18 @@ class MKGallery {
         }, 2700);
       }, 400);
     };
-    window.addEventListener('curtainClosed', doUnroll, { once: true });
+    // Drop the fabric down when the hero scrolls into view (Visit Us now sits above it)
+    const hero = document.getElementById('hero');
+    if (hero) {
+      const io = new IntersectionObserver((entries, ob) => {
+        entries.forEach(en => {
+          if (en.isIntersecting) { doUnroll(); ob.disconnect(); }
+        });
+      }, { threshold: 0.35 });
+      io.observe(hero);
+    } else {
+      window.addEventListener('curtainClosed', doUnroll, { once: true });
+    }
   }
 
   initPerformance() {
@@ -390,13 +401,12 @@ class MKGallery {
       b.addEventListener('click', e => { e.preventDefault(); openModal(modal); resetForm(); });
     });
 
-    document.querySelectorAll('.btn-trigger-estimate').forEach(b => {
-      b.addEventListener('click', e => {
+    // Product / collection cards redirect to Clavyk.com
+    document.querySelectorAll('#catalog .product-card, .btn-trigger-estimate').forEach(el => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', e => {
         e.preventDefault(); e.stopPropagation();
-        const title = document.getElementById('drawer-product-title');
-        if (title) title.textContent = b.getAttribute('data-product') + ' Estimate';
-        this.setupCalc(b.getAttribute('data-product'), b.getAttribute('data-price'), b.getAttribute('data-type'));
-        openModal(drawer);
+        window.open('https://clavyk.com', '_blank', 'noopener');
       });
     });
 
